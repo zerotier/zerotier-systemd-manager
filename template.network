@@ -1,0 +1,11 @@
+# vim: ft=systemd
+[Match]
+Name={{ .Interface }}
+
+[Network]
+Description={{ .NetworkName }}
+DHCP=no
+DNS={{ .DNS }}
+Domains=~{{ .DNSSearch }}
+ConfigureWithoutCarrier=true
+KeepConfiguration=static
