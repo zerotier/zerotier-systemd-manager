@@ -17,9 +17,7 @@ Install our [slightly modified zerotier-one.service file](contrib/zerotier-one.s
 
 Ensure `systemd-networkd` is properly configured and `resolvectl` works as intended.
 
-Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfaces with DNS assignments in ZeroTier, it will populate files in `/etc/systemd/network`. No DNS assignment, no file.
-
-Run `systemctl restart systemd-networkd`. Eventually some diffing logic will be added to determine when to kick the service, but you may just want to run it by hand when you join a network until then.
+Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfaces with DNS assignments in ZeroTier, it will populate files in `/etc/systemd/network`. No DNS assignment, no file. Unless you have passed `-auto-restart=false`, it will restart `systemd-networkd` for you if things have changed.
 
 There is no detection of left networks, to avoid destroying files you care about. Remove these files manually. For better or worse, they are set up in a way that creates no interference, so as long as you don't get a similar interface name (unlikely), you're on solid ground.
 

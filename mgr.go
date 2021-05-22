@@ -94,7 +94,6 @@ func main() {
 	for _, network := range *networks.JSON200 {
 		if network.Dns != nil && len(*network.Dns.Servers) != 0 {
 			fn := fmt.Sprintf("/etc/systemd/network/99-%s.network", *network.PortDeviceName)
-			fmt.Printf("Generating %q\n", fn)
 
 			var search string
 			if network.Dns.Domain != nil {
@@ -121,11 +120,12 @@ func main() {
 				}
 
 				if bytes.Equal(content, buf.Bytes()) {
-					fmt.Printf("%q hasn't changed; skipping\n", fn)
+					fmt.Fprintf(os.Stderr, "%q hasn't changed; skipping\n", fn)
 					continue
 				}
 			}
 
+			fmt.Printf("Generating %q\n", fn)
 			f, err := os.Create(fn)
 			if err != nil {
 				errExit(fmt.Errorf("%q: %w", fn, err))
