@@ -1,4 +1,5 @@
 # vim: ft=systemd
+# {{ .MagicComment }}
 [Match]
 Name={{ .Interface }}
 

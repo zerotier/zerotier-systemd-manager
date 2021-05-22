@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -20,11 +22,17 @@ import (
 //go:embed template.network
 var networkTemplate string
 
+const (
+	magicComment = "--- Managed by zerotier-systemd-manager. Do not remove this comment. ---"
+	networkDir   = "/etc/systemd/network"
+)
+
 type templateScaffold struct {
-	Interface   string
-	NetworkName string
-	DNS         string
-	DNSSearch   string
+	Interface    string
+	NetworkName  string
+	DNS          string
+	DNSSearch    string
+	MagicComment string
 }
 
 type serviceAPIClient struct {
@@ -53,7 +61,8 @@ func (c *serviceAPIClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func main() {
-	autoRestart := flag.Bool("auto-restart", true, "Automatically restart systemd-networkd when things change")
+	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-networkd when things change")
+	reconcileFlag := flag.Bool("reconcile", true, "Automatically remove left networks from systemd-networkd configuration")
 	flag.Parse()
 
 	if os.Geteuid() != 0 {
@@ -89,11 +98,33 @@ func main() {
 		errExit(err)
 	}
 
+	dir, err := os.ReadDir(networkDir)
+	if err != nil {
+		errExit(err)
+	}
+
+	found := map[string]struct{}{}
+
+	for _, item := range dir {
+		if item.Type().IsRegular() && strings.HasSuffix(item.Name(), ".network") {
+			content, err := ioutil.ReadFile(filepath.Join(networkDir, item.Name()))
+			if err != nil {
+				errExit(err)
+			}
+
+			if bytes.Contains(content, []byte(magicComment)) {
+				found[item.Name()] = struct{}{}
+			}
+		}
+	}
+
 	var changed bool
 
 	for _, network := range *networks.JSON200 {
 		if network.Dns != nil && len(*network.Dns.Servers) != 0 {
 			fn := fmt.Sprintf("/etc/systemd/network/99-%s.network", *network.PortDeviceName)
+
+			delete(found, path.Base(fn))
 
 			var search string
 			if network.Dns.Domain != nil {
@@ -101,10 +132,11 @@ func main() {
 			}
 
 			out := templateScaffold{
-				Interface:   *network.PortDeviceName,
-				NetworkName: *network.Name,
-				DNS:         strings.Join(*network.Dns.Servers, ","),
-				DNSSearch:   search,
+				Interface:    *network.PortDeviceName,
+				NetworkName:  *network.Name,
+				DNS:          strings.Join(*network.Dns.Servers, ","),
+				DNSSearch:    search,
+				MagicComment: magicComment,
 			}
 
 			buf := bytes.NewBuffer(nil)
@@ -141,7 +173,19 @@ func main() {
 		}
 	}
 
-	if changed && *autoRestart {
+	if len(found) > 0 && *reconcileFlag {
+		fmt.Println("Found unused networks, reconciling...")
+
+		for fn := range found {
+			fmt.Printf("Removing %q\n", fn)
+
+			if err := os.Remove(filepath.Join(networkDir, fn)); err != nil {
+				errExit(fmt.Errorf("While removing %q: %w", fn, err))
+			}
+		}
+	}
+
+	if changed && *autoRestartFlag {
 		fmt.Println("Files changed; reloading systemd-networkd...")
 
 		if err := exec.Command("systemctl", "restart", "systemd-networkd").Run(); err != nil {
