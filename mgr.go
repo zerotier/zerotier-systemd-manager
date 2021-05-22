@@ -127,6 +127,8 @@ func main() {
 			if _, err := f.Write(buf.Bytes()); err != nil {
 				errExit(err)
 			}
+
+			f.Close()
 		}
 	}
 }
