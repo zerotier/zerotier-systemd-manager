@@ -19,7 +19,9 @@ Ensure `systemd-networkd` is properly configured and `resolvectl` works as inten
 
 Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfaces with DNS assignments in ZeroTier, it will populate files in `/etc/systemd/network`. No DNS assignment, no file. Unless you have passed `-auto-restart=false`, it will restart `systemd-networkd` for you if things have changed.
 
-There is no detection of left networks, to avoid destroying files you care about. Remove these files manually. For better or worse, they are set up in a way that creates no interference, so as long as you don't get a similar interface name (unlikely), you're on solid ground.
+Finally, if you have left a DNS-controlled network it will try to remove the old files if `-reconcile=true` is set (the default). This way you can stuff it in cron and not think about it too much.
+
+Enjoy!
 
 ## Author
 
