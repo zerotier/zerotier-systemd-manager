@@ -11,7 +11,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/erikh/zerotier-systemd-manager/service"
+	"github.com/zerotier/zerotier-systemd-manager/service"
 )
 
 //go:embed template.network

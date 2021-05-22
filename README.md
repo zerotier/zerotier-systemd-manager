@@ -10,7 +10,7 @@ Compile it with [golang](https://golang.org):
 
 ```bash
 # be outside of gopath when you do this
-go get github.com/erikh/zerotier-systemd-manager
+go get github.com/zerotier/zerotier-systemd-manager
 ```
 
 Install our [slightly modified zerotier-one.service file](contrib/zerotier-one.service) in `/usr/lib/systemd/system` on Ubuntu, but this location may be different for other operating systems. This will make `zerotier-one` depend on `systemd-networkd`.

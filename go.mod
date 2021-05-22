@@ -1,4 +1,4 @@
-module github.com/erikh/zerotier-systemd-manager
+module github.com/zerotier/zerotier-systemd-manager
 
 go 1.16
 
