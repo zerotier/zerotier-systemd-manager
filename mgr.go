@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 
@@ -51,6 +53,8 @@ func (c *serviceAPIClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func main() {
+	autoRestart := flag.Bool("auto-restart", true, "Automatically restart systemd-networkd when things change")
+
 	if os.Geteuid() != 0 {
 		errExit("You need to be root to run this program")
 	}
@@ -83,6 +87,8 @@ func main() {
 	if err != nil {
 		errExit(err)
 	}
+
+	var changed bool
 
 	for _, network := range *networks.JSON200 {
 		if network.Dns != nil && len(*network.Dns.Servers) != 0 {
@@ -129,6 +135,16 @@ func main() {
 			}
 
 			f.Close()
+
+			changed = true
+		}
+	}
+
+	if changed && *autoRestart {
+		fmt.Println("Files changed; reloading systemd-networkd...")
+
+		if err := exec.Command("systemctl", "restart", "systemd-networkd").Run(); err != nil {
+			errExit(fmt.Errorf("While reloading systemd: %v", err))
 		}
 	}
 }
