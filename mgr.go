@@ -54,6 +54,7 @@ func (c *serviceAPIClient) Do(req *http.Request) (*http.Response, error) {
 
 func main() {
 	autoRestart := flag.Bool("auto-restart", true, "Automatically restart systemd-networkd when things change")
+	flag.Parse()
 
 	if os.Geteuid() != 0 {
 		errExit("You need to be root to run this program")
