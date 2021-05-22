@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
 	"fmt"
@@ -100,13 +101,31 @@ func main() {
 				DNSSearch:   search,
 			}
 
+			buf := bytes.NewBuffer(nil)
+
+			if err := t.Execute(buf, out); err != nil {
+				errExit(fmt.Errorf("%q: %w", fn, err))
+			}
+
+			if _, err := os.Stat(fn); err == nil {
+				content, err := ioutil.ReadFile(fn)
+				if err != nil {
+					errExit(fmt.Errorf("In %v: %w", fn, err))
+				}
+
+				if bytes.Equal(content, buf.Bytes()) {
+					fmt.Printf("%q hasn't changed; skipping\n", fn)
+					continue
+				}
+			}
+
 			f, err := os.Create(fn)
 			if err != nil {
 				errExit(fmt.Errorf("%q: %w", fn, err))
 			}
 
-			if err := t.Execute(f, out); err != nil {
-				errExit(fmt.Errorf("%q: %w", fn, err))
+			if _, err := f.Write(buf.Bytes()); err != nil {
+				errExit(err)
 			}
 		}
 	}
