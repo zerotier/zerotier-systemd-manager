@@ -1,0 +1,12 @@
+[Unit]
+Description=Update zerotier per-interface DNS settings
+Requires=zerotier-systemd-manager.service
+
+[Timer]
+Unit=zerotier-systemd-manager.service
+OnStartupSec=60
+OnUnitInactiveSec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target

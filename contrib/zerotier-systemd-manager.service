@@ -1,0 +1,10 @@
+[Unit]
+Description=Update zerotier per-interface DNS settings
+Wants=zerotier-systemd-manager.timer zerotier-one.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/zerotier-systemd-manager
+
+[Install]
+WantedBy=multi-user.target
