@@ -19,6 +19,7 @@ nfpms:
   - formats:
       - deb
       - rpm
+    bindir: /usr/bin
     dependencies:
       - systemd
     contents:
