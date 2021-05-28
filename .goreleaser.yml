@@ -1,0 +1,46 @@
+# This is an example .goreleaser.yml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+archives:
+  - wrap_in_directory: true
+    files:
+      - LICENSE
+      - README.md
+      - contrib/*
+nfpms:
+  - formats:
+      - deb
+      - rpm
+    dependencies:
+      - systemd
+    contents:
+      - src: contrib/zerotier-one.service
+        dst: /var/run/zerotier-one.service
+        type: "config"
+      - src: contrib/zerotier-systemd-manager.timer
+        dst: /lib/systemd/system/zerotier-systemd-manager.timer
+        type: "config"
+      - src: contrib/zerotier-systemd-manager.service
+        dst: /lib/systemd/system/zerotier-systemd-manager.service
+        type: "config"
+    scripts:
+      postinstall: "postrun.sh"
+      postremove: "postrun.sh"
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
