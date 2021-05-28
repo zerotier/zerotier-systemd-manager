@@ -20,6 +20,7 @@ nfpms:
       - deb
       - rpm
     bindir: /usr/bin
+    maintainer: Erik Hollensbe <erik@hollensbe.org>
     dependencies:
       - systemd
     contents:
