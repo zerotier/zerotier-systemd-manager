@@ -10,7 +10,7 @@ The result is per-interface DNS settings, which is especially nice when you are 
 
 ### Installing From Source
 
-Compile it with [golang](https://golang.org):
+Compile it with [golang 1.16 or later](https://golang.org):
 
 ```bash
 # be outside of gopath when you do this
