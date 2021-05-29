@@ -42,8 +42,8 @@ nfpms:
         dst: /lib/systemd/system/zerotier-systemd-manager.service
         type: "config"
     scripts:
-      postinstall: "postrun.sh"
-      postremove: "postrun.sh"
+      postinstall: "pkgsrc/postinstall.sh"
+      postremove: "pkgsrc/postremove.sh"
 checksum:
   name_template: 'checksums.txt'
 snapshot:
