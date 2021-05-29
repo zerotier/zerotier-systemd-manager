@@ -6,6 +6,10 @@ The result is per-interface DNS settings, which is especially nice when you are 
 
 ## Usage
 
+[Check out our releases for debian and redhat packages that automate this on a variety of platforms](https://github.com/zerotier/zerotier-systemd-manager/releases).
+
+### Installing From Source
+
 Compile it with [golang](https://golang.org):
 
 ```bash
