@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/zerotier/zerotier-systemd-manager/service"
@@ -25,12 +27,13 @@ var networkTemplate string
 const (
 	magicComment = "--- Managed by zerotier-systemd-manager. Do not remove this comment. ---"
 	networkDir   = "/etc/systemd/network"
+	ipv4bits     = net.IPv4len * 8
 )
 
 type templateScaffold struct {
 	Interface    string
 	NetworkName  string
-	DNS          string
+	DNS          []string
 	DNSSearch    string
 	MagicComment string
 }
@@ -126,16 +129,61 @@ func main() {
 
 			delete(found, path.Base(fn))
 
-			var search string
+			search := map[string]struct{}{}
+
 			if network.Dns.Domain != nil {
-				search = *network.Dns.Domain
+				search[*network.Dns.Domain] = struct{}{}
 			}
+
+			// This calculates in-addr.arpa and ip6.arpa search domains by calculating them from the IP assignments.
+			// This probably only works for ipv4 right now.
+			if network.AssignedAddresses != nil && len(*network.AssignedAddresses) > 0 {
+				for _, addr := range *network.AssignedAddresses {
+					ip, ipnet, err := net.ParseCIDR(addr)
+					if err != nil {
+						errExit(fmt.Sprintf("Could not parse CIDR %q: %v", addr, err))
+					}
+
+					used, total := ipnet.Mask.Size()
+					bits := total / used
+
+					octets := make([]uint8, bits)
+					if total == ipv4bits {
+						ip = ip.To4()
+					}
+
+					for i := 0; i < bits; i++ {
+						octets[i] = uint8(ip[i])
+					}
+
+					searchLine := "~"
+					for i := len(octets) - 1; i >= 0; i-- {
+						searchLine += fmt.Sprintf("%d.", octets[i])
+					}
+
+					if total == ipv4bits {
+						searchLine += "in-addr.arpa"
+					} else {
+						searchLine += "ip6.arpa"
+					}
+
+					search[searchLine] = struct{}{}
+				}
+			}
+
+			searchkeys := []string{}
+
+			for key := range search {
+				searchkeys = append(searchkeys, key)
+			}
+
+			sort.Strings(searchkeys)
 
 			out := templateScaffold{
 				Interface:    *network.PortDeviceName,
 				NetworkName:  *network.Name,
-				DNS:          strings.Join(*network.Dns.Servers, ","),
-				DNSSearch:    search,
+				DNS:          *network.Dns.Servers,
+				DNSSearch:    strings.Join(searchkeys, " "),
 				MagicComment: magicComment,
 			}
 

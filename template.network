@@ -6,7 +6,9 @@ Name={{ .Interface }}
 [Network]
 Description={{ .NetworkName }}
 DHCP=no
-DNS={{ .DNS }}
+{{ range $key := .DNS -}}
+DNS={{ $key }}
+{{ end -}}
 Domains=~{{ .DNSSearch }}
 ConfigureWithoutCarrier=true
 KeepConfiguration=static
