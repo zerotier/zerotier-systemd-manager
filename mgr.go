@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -145,20 +146,25 @@ func main() {
 					}
 
 					used, total := ipnet.Mask.Size()
-					bits := total / used
+					bits := int(math.Ceil(float64(total) / float64(used)))
 
-					octets := make([]uint8, bits)
+					octets := make([]byte, bits)
 					if total == ipv4bits {
 						ip = ip.To4()
 					}
 
 					for i := 0; i < bits; i++ {
-						octets[i] = uint8(ip[i])
+						octets[i] = ip[i]
 					}
 
 					searchLine := "~"
 					for i := len(octets) - 1; i >= 0; i-- {
-						searchLine += fmt.Sprintf("%d.", octets[i])
+						if total > ipv4bits {
+							searchLine += fmt.Sprintf("%x.", (octets[i] & 0xf))
+							searchLine += fmt.Sprintf("%x.", ((octets[i] >> 4) & 0xf))
+						} else {
+							searchLine += fmt.Sprintf("%d.", octets[i])
+						}
 					}
 
 					if total == ipv4bits {
