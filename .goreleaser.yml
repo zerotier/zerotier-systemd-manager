@@ -32,9 +32,6 @@ nfpms:
     dependencies:
       - systemd
     contents:
-      - src: contrib/zerotier-one.service
-        dst: /var/run/zerotier-one.service
-        type: "config"
       - src: contrib/zerotier-systemd-manager.timer
         dst: /lib/systemd/system/zerotier-systemd-manager.timer
         type: "config"
