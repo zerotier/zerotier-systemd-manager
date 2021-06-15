@@ -2,7 +2,7 @@
 Description=Update zerotier per-interface DNS settings
 
 [Timer]
-OnStartupSec=2min
+OnStartupSec=1min
 OnUnitInactiveSec=1min
 
 [Install]
