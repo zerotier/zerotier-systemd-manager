@@ -44,7 +44,7 @@ type serviceAPIClient struct {
 	client *http.Client
 }
 
-func NewServiceAPI() (*serviceAPIClient, error) {
+func newServiceAPI() (*serviceAPIClient, error) {
 	content, err := ioutil.ReadFile("/var/lib/zerotier-one/authtoken.secret")
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func main() {
 		errExit("your template is busted; get a different version or stop modifying the source code :)")
 	}
 
-	sAPI, err := NewServiceAPI()
+	sAPI, err := newServiceAPI()
 	if err != nil {
 		errExit(err)
 	}
