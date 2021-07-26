@@ -239,8 +239,8 @@ func main() {
 		}
 	}
 
-	if changed && *autoRestartFlag {
-		fmt.Println("Files changed; reloading systemd-networkd...")
+	if (changed || len(found) > 0) && *autoRestartFlag {
+		fmt.Println("Files changed; restarting systemd-resolved...")
 
 		if err := exec.Command("systemctl", "restart", "systemd-resolved").Run(); err != nil {
 			errExit(fmt.Errorf("While restarting systemd-resolved: %v", err))
