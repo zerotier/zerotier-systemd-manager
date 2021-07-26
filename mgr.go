@@ -65,7 +65,7 @@ func (c *serviceAPIClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func main() {
-	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-networkd when things change")
+	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-resolved when things change")
 	reconcileFlag := flag.Bool("reconcile", true, "Automatically remove left networks from systemd-networkd configuration")
 	flag.Parse()
 
@@ -242,8 +242,8 @@ func main() {
 	if changed && *autoRestartFlag {
 		fmt.Println("Files changed; reloading systemd-networkd...")
 
-		if err := exec.Command("systemctl", "restart", "systemd-networkd").Run(); err != nil {
-			errExit(fmt.Errorf("While reloading systemd: %v", err))
+		if err := exec.Command("systemctl", "restart", "systemd-resolved").Run(); err != nil {
+			errExit(fmt.Errorf("While restarting systemd-resolved: %v", err))
 		}
 	}
 }
