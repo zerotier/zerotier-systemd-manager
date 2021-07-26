@@ -44,7 +44,7 @@ type serviceAPIClient struct {
 	client *http.Client
 }
 
-func NewServiceAPI() (*serviceAPIClient, error) {
+func newServiceAPI() (*serviceAPIClient, error) {
 	content, err := ioutil.ReadFile("/var/lib/zerotier-one/authtoken.secret")
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (c *serviceAPIClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func main() {
-	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-networkd when things change")
+	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-resolved when things change")
 	reconcileFlag := flag.Bool("reconcile", true, "Automatically remove left networks from systemd-networkd configuration")
 	flag.Parse()
 
@@ -82,7 +82,7 @@ func main() {
 		errExit("your template is busted; get a different version or stop modifying the source code :)")
 	}
 
-	sAPI, err := NewServiceAPI()
+	sAPI, err := newServiceAPI()
 	if err != nil {
 		errExit(err)
 	}
@@ -239,11 +239,11 @@ func main() {
 		}
 	}
 
-	if changed && *autoRestartFlag {
-		fmt.Println("Files changed; reloading systemd-networkd...")
+	if (changed || len(found) > 0) && *autoRestartFlag {
+		fmt.Println("Files changed; restarting systemd-resolved...")
 
-		if err := exec.Command("systemctl", "restart", "systemd-networkd").Run(); err != nil {
-			errExit(fmt.Errorf("While reloading systemd: %v", err))
+		if err := exec.Command("systemctl", "restart", "systemd-resolved").Run(); err != nil {
+			errExit(fmt.Errorf("While restarting systemd-resolved: %v", err))
 		}
 	}
 }
