@@ -14,6 +14,7 @@ builds:
       - amd64
       - arm
       - arm64
+      - s390x
     goarm:
       - 6
       - 7
