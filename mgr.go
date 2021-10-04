@@ -31,6 +31,7 @@ const (
 	ipv4bits     = net.IPv4len * 8
 )
 
+// parameter list for multiple template operations
 type templateScaffold struct {
 	Interface    string
 	NetworkName  string
@@ -39,6 +40,8 @@ type templateScaffold struct {
 	MagicComment string
 }
 
+// wrapped openapi client. should probably be replaced with a code generator in
+// a separate repository as it's always out of date.
 type serviceAPIClient struct {
 	apiKey string
 	client *http.Client
@@ -58,13 +61,14 @@ func errExit(msg interface{}) {
 	os.Exit(1)
 }
 
-// Do initiates a client transaction.
+// Do initiates a client transaction. 99% of what the wrapped client does is inject the right header.
 func (c *serviceAPIClient) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Add("X-ZT1-Auth", c.apiKey)
 	return c.client.Do(req)
 }
 
 func main() {
+	// two flags for the CLI auto-restart and reconcile are defaulted to true, so you rarely need them.
 	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-resolved when things change")
 	reconcileFlag := flag.Bool("reconcile", true, "Automatically remove left networks from systemd-networkd configuration")
 	flag.Parse()
@@ -81,6 +85,13 @@ func main() {
 	if err != nil {
 		errExit("your template is busted; get a different version or stop modifying the source code :)")
 	}
+
+	/*
+		 	 this bit is fundamentally a set difference of the networks zerotier knows
+			 about, and systemd-resolved knows about. If reconcile is true, this is
+			 corrected. If any corrections are made, or any networks added, and
+			 auto-restart is true, then systemd-resolved is reloaded near the end.
+	*/
 
 	sAPI, err := newServiceAPI()
 	if err != nil {
@@ -137,7 +148,6 @@ func main() {
 			}
 
 			// This calculates in-addr.arpa and ip6.arpa search domains by calculating them from the IP assignments.
-			// This probably only works for ipv4 right now.
 			if network.AssignedAddresses != nil && len(*network.AssignedAddresses) > 0 {
 				for _, addr := range *network.AssignedAddresses {
 					ip, ipnet, err := net.ParseCIDR(addr)
