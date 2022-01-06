@@ -19,7 +19,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/zerotier/zerotier-systemd-manager/service"
+	"github.com/zerotier/go-zerotier-one/service"
 )
 
 //go:embed template.network
