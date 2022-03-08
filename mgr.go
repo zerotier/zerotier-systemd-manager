@@ -38,6 +38,7 @@ type templateScaffold struct {
 	DNS          []string
 	DNSSearch    string
 	MagicComment string
+	DNSOverTLS   bool
 }
 
 // wrapped openapi client. should probably be replaced with a code generator in
@@ -71,6 +72,7 @@ func main() {
 	// two flags for the CLI auto-restart and reconcile are defaulted to true, so you rarely need them.
 	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-resolved when things change")
 	reconcileFlag := flag.Bool("reconcile", true, "Automatically remove left networks from systemd-networkd configuration")
+	dnsOverTLSFlag := flag.Bool("dns-over-tls", true, "Automatically prefer DNS-over-TLS. Requires ZeroNSd v0.4 or better")
 	flag.Parse()
 
 	if os.Geteuid() != 0 {
@@ -201,6 +203,7 @@ func main() {
 				DNS:          *network.Dns.Servers,
 				DNSSearch:    strings.Join(searchkeys, " "),
 				MagicComment: magicComment,
+				DNSOverTLS:   *dnsOverTLSFlag,
 			}
 
 			buf := bytes.NewBuffer(nil)
