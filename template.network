@@ -9,6 +9,9 @@ DHCP=no
 {{ range $key := .DNS -}}
 DNS={{ $key }}
 {{ end -}}
+{{ if .DNSOverTLS -}}
+DNSOverTLS=yes
+{{ end -}}
 Domains=~{{ .DNSSearch }}
 ConfigureWithoutCarrier=true
 KeepConfiguration=static
