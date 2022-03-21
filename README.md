@@ -17,8 +17,6 @@ Compile it with [golang 1.16 or later](https://golang.org):
 go get github.com/zerotier/zerotier-systemd-manager
 ```
 
-Install our [slightly modified zerotier-one.service file](contrib/zerotier-one.service) in `/usr/lib/systemd/system` on Ubuntu, but this location may be different for other operating systems. This will make `zerotier-one` depend on `systemd-networkd`.
-
 Ensure `systemd-networkd` is properly configured and `resolvectl` works as intended.
 
 Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfaces with DNS assignments in ZeroTier, it will populate files in `/etc/systemd/network`. No DNS assignment, no file. Unless you have passed `-auto-restart=false`, it will restart `systemd-networkd` for you if things have changed.
