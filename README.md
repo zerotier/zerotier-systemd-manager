@@ -21,6 +21,8 @@ Ensure `systemd-networkd` is properly configured and `resolvectl` works as inten
 
 Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfaces with DNS assignments in ZeroTier, it will populate files in `/etc/systemd/network`. No DNS assignment, no file. Unless you have passed `-auto-restart=false`, it will restart `systemd-networkd` for you if things have changed.
 
+If you have a DNS-over-TLS configuration provided by zeronsd (v0.4.0 or later), you can enable using it by providing `-dns-over-tls=true` in the supervisor (a systemd timer in the default case). You will have to hand-edit this in for now.
+
 Finally, if you have left a DNS-controlled network it will try to remove the old files if `-reconcile=true` is set (the default). This way you can stuff it in cron and not think about it too much.
 
 Enjoy!
