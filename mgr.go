@@ -28,7 +28,7 @@ var networkTemplate string
 const (
 	magicComment = "--- Managed by zerotier-systemd-manager. Do not remove this comment. ---"
 	networkDir   = "/etc/systemd/network"
-	ipv4bits     = net.IPv4len * 8
+	ipv4bits     = 32
 )
 
 // parameter list for multiple template operations
@@ -158,14 +158,15 @@ func main() {
 					}
 
 					used, total := ipnet.Mask.Size()
-					bits := int(math.Ceil(float64(total) / float64(used)))
 
-					octets := make([]byte, bits)
+					bits := int(math.Trunc(math.Ceil(float64(total) / float64(used))))
+
+					octets := make([]byte, bits+1)
 					if total == ipv4bits {
 						ip = ip.To4()
 					}
 
-					for i := 0; i < bits; i++ {
+					for i := 0; i <= bits; i++ {
 						octets[i] = ip[i]
 					}
 
