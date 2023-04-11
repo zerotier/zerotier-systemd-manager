@@ -39,6 +39,7 @@ type templateScaffold struct {
 	DNSSearch    string
 	MagicComment string
 	DNSOverTLS   bool
+	MulticastDNS bool
 }
 
 // wrapped openapi client. should probably be replaced with a code generator in
@@ -73,6 +74,7 @@ func main() {
 	autoRestartFlag := flag.Bool("auto-restart", true, "Automatically restart systemd-resolved when things change")
 	reconcileFlag := flag.Bool("reconcile", true, "Automatically remove left networks from systemd-networkd configuration")
 	dnsOverTLSFlag := flag.Bool("dns-over-tls", false, "Automatically prefer DNS-over-TLS. Requires ZeroNSd v0.4 or better")
+	multicastDNSFlag := flag.Bool("multicast-dns", false, "Enable mDNS resolution on the zerotier interface.")
 	flag.Parse()
 
 	if os.Geteuid() != 0 {
@@ -205,6 +207,7 @@ func main() {
 				DNSSearch:    strings.Join(searchkeys, " "),
 				MagicComment: magicComment,
 				DNSOverTLS:   *dnsOverTLSFlag,
+				MulticastDNS: *multicastDNSFlag,
 			}
 
 			buf := bytes.NewBuffer(nil)

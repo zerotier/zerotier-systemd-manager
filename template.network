@@ -12,6 +12,9 @@ DNS={{ $key }}
 {{ if .DNSOverTLS -}}
 DNSOverTLS=yes
 {{ end -}}
+{{ if .MulticastDNS -}}
+MulticastDNS=yes
+{{ end -}}
 Domains=~{{ .DNSSearch }}
 ConfigureWithoutCarrier=true
 KeepConfiguration=static

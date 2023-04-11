@@ -23,6 +23,8 @@ Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfa
 
 If you have a DNS-over-TLS configuration provided by zeronsd (v0.4.0 or later), you can enable using it by providing `-dns-over-tls=true` in the supervisor (a systemd timer in the default case). You will have to hand-edit this in for now.
 
+If you want to enable multicast DNS / bonjour / mDNS you can enable it by providing `-multicast-dns`.
+
 Finally, if you have left a DNS-controlled network it will try to remove the old files if `-reconcile=true` is set (the default). This way you can stuff it in cron and not think about it too much.
 
 Enjoy!
