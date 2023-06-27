@@ -36,3 +36,7 @@ Erik Hollensbe <github@hollensbe.org>
 ## License
 
 BSD 3-Clause
+
+## Releasing
+This repo uses [goreleaser](https://goreleaser.com/quick-start/). 
+
