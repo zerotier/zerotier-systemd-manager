@@ -18,7 +18,11 @@ go get github.com/zerotier/zerotier-systemd-manager
 ```
 
 Ensure `systemd-networkd` is properly configured and `resolvectl` works as intended.
-
+Additionally, make sure to have a `/etc/hosts` file that allows to locally resolve `localhost` e.g containing at least: 
+```
+127.0.0.1        localhost
+::1              localhost
+```
 Finally, run the tool as `root`: `zerotier-systemd-manager`. If you have interfaces with DNS assignments in ZeroTier, it will populate files in `/etc/systemd/network`. No DNS assignment, no file. Unless you have passed `-auto-restart=false`, it will restart `systemd-networkd` for you if things have changed.
 
 If you have a DNS-over-TLS configuration provided by zeronsd (v0.4.0 or later), you can enable using it by providing `-dns-over-tls=true` in the supervisor (a systemd timer in the default case). You will have to hand-edit this in for now.
