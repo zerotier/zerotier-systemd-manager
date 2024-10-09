@@ -6,6 +6,8 @@ The result is per-interface DNS settings, which is especially nice when you are 
 
 ## Usage
 
+**Make sure your distro supports systemd-networkd and that it is enabled and started**
+
 [Check out our releases for debian and redhat packages that automate this on a variety of platforms](https://github.com/zerotier/zerotier-systemd-manager/releases).
 
 ### Installing From Source
